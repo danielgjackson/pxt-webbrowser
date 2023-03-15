@@ -9,14 +9,14 @@
 namespace webbrowser {
     //% block
     export function helloWorld() {
-
+        basic.showNumber(1)
     }
-
+    
     // note that Caml casing yields lower case
     // block text with spaces
-
+    
     //% block
     export function camlCaseTwo() {
-
+        basic.showNumber(2)
     }
 }
