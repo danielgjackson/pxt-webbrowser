@@ -1,9 +1,8 @@
 {
-    "name": "Untitled",
+    "name": "Web Browser",
     "description": "",
     "dependencies": {
         "core": "*",
-        "microphone": "*",
         "bluetooth": "*"
     },
     "files": [
