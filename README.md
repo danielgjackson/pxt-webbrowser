@@ -35,8 +35,13 @@ This image may take a few minutes to refresh.
 # Windows:  http://docs.yottabuild.org/#installing-on-windows
 # Windows (move to C:\):   https://sourceforge.net/projects/srecord/files/srecord-win32/1.64/
 
+# Install pxt command line tool
 npm install -g pxt
+
+# Downloads micro:bit editor tools
 pxt target microbit
+
+# Install extensions to pxt_modules
 pxt install
 
 # Run PXT interface locally
