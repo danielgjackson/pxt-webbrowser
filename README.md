@@ -29,3 +29,17 @@ This image may take a few minutes to refresh.
 
 * for PXT/microbit
 <script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
+
+<!--
+```bash
+# Windows:  http://docs.yottabuild.org/#installing-on-windows
+# Windows (move to C:\):   https://sourceforge.net/projects/srecord/files/srecord-win32/1.64/
+
+npm install -g pxt
+pxt target microbit
+pxt install
+
+# Run PXT interface locally
+pxt serve
+```
+-->
