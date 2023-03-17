@@ -2,6 +2,12 @@ browserBridge.onReceivedString(function (message) {
     basic.showIcon(IconNames.Happy, 500)
     basic.showString(message)
 })
+browserBridge.onReceivedValue(function (name, value) {
+    basic.showIcon(IconNames.Diamond, 500)
+    basic.showString(name)
+    basic.showIcon(IconNames.SmallDiamond, 500)
+    basic.showNumber(value)
+})
 browserBridge.onConnected(function () {
     basic.showIcon(IconNames.Yes, 500)
 })
