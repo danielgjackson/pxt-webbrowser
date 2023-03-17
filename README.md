@@ -1,5 +1,7 @@
 
-> Open this page at [https://danielgjackson.github.io/pxt-webbrowser/](https://danielgjackson.github.io/pxt-webbrowser/)
+> Open this page at [https://danielgjackson.github.io/pxt-webbrowser/](danielgjackson.github.io/pxt-webbrowser)
+
+> On the mobile device, open the client page at [https://danielgjackson.github.io/pxt-webbrowser/client/](danielgjackson.github.io/pxt-webbrowser/client)
 
 ## Use as Extension
 

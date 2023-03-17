@@ -1,0 +1,12 @@
+{
+    "name": "Browser Bridge",
+    "short_name": "Browser Bridge",
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "Browser Bridge client.",
+    "icons": [{
+        "src": "favicon.svg",
+        "sizes": "any",
+        "type": "image/svg+xml"
+    }]
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="2"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   version="1.1"
+   id="svg29"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs33" />
+  <sodipodi:namedview
+     id="namedview31"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="33.458333"
+     inkscape:cx="12"
+     inkscape:cy="12.029888"
+     inkscape:window-width="1390"
+     inkscape:window-height="953"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg29" />
+  <path
+     id="line27"
+     style="color:#000000;fill:#000000;-inkscape-stroke:none;stroke:none"
+     d="m 1,13 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 H 4 A 1,1 0 0 0 5,14 1,1 0 0 0 4,13 Z M 1,8 A 1,1 0 0 0 0,9 1,1 0 0 0 1,10 H 4 A 1,1 0 0 0 5,9 1,1 0 0 0 4,8 Z m 19,5 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 h 3 a 1,1 0 0 0 1,-1 1,1 0 0 0 -1,-1 z m 0,-5 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 h 3 A 1,1 0 0 0 24,9 1,1 0 0 0 23,8 Z m -5,11 a 1,1 0 0 0 -1,1 v 3 a 1,1 0 0 0 1,1 1,1 0 0 0 1,-1 v -3 a 1,1 0 0 0 -1,-1 z m -6,0 a 1,1 0 0 0 -1,1 v 3 a 1,1 0 0 0 1,1 1,1 0 0 0 1,-1 V 20 A 1,1 0 0 0 9,19 Z M 15,0 a 1,1 0 0 0 -1,1 v 3 a 1,1 0 0 0 1,1 1,1 0 0 0 1,-1 V 1 A 1,1 0 0 0 15,0 Z M 9,0 A 1,1 0 0 0 8,1 V 4 A 1,1 0 0 0 9,5 1,1 0 0 0 10,4 V 1 A 1,1 0 0 0 9,0 Z M 9,8 A 1.0001,1.0001 0 0 0 8,9 v 6 a 1.0001,1.0001 0 0 0 1,1 h 6 a 1.0001,1.0001 0 0 0 1,-1 V 9 A 1.0001,1.0001 0 0 0 15,8 Z m 1,2 h 4 v 4 H 10 Z M 6,3 C 4.3552989,3 3,4.3552989 3,6 v 12 c 0,1.644701 1.3552989,3 3,3 h 12 c 1.644701,0 3,-1.355299 3,-3 V 6 C 21,4.3552989 19.644701,3 18,3 Z m 0,2 h 12 c 0.571297,0 1,0.4287033 1,1 v 12 c 0,0.571297 -0.428703,1 -1,1 H 6 C 5.4287033,19 5,18.571297 5,18 V 6 C 5,5.4287033 5.4287033,5 6,5 Z"
+     inkscape:label="line" />
+</svg>
