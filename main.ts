@@ -3,6 +3,7 @@
  */
 
 //% color="#AA278D" weight=100 icon="\uf3cd" block="Browser Bridge"
+//% groups=['Connection', 'Data']
 namespace browserBridge {
 
     enum Connection {
@@ -28,7 +29,8 @@ namespace browserBridge {
         started = true
     }
 
-    //% block="start Bluetooth browser bridge"
+    //% block="start browser bridge"
+    //% group="Connection"
     export function startupBluetooth() {
         startup()
         bluetooth.onBluetoothConnected(function () {
@@ -56,6 +58,8 @@ namespace browserBridge {
     }
 
     //% block="start serial browser bridge"
+    //% group="Connection"
+    //% advanced=true
     export function startupSerial() {
         startup()
         serial.setRxBufferSize(64)
@@ -100,8 +104,13 @@ namespace browserBridge {
     }
 
     // Transmit packet to one or more connections
-    function transmit(connection: Connection, data: object) {
-        const line = JSON.stringify(data)
+    function transmit(connection: Connection, data: object | string) {
+        let line: string;
+        if (typeof data === 'string') {
+            line = data
+        } else {
+            line = JSON.stringify(data)
+        }
         if (connectedBluetooth && (connection == Connection.Bluetooth || connection == Connection.Broadcast)) {
             bluetooth.uartWriteLine(line)
         }
@@ -109,20 +118,14 @@ namespace browserBridge {
             serial.writeLine(line)
         }
     }
-    
-    //% block
-    export function sendString(message: string) {
-        const data = {
-            type: 'string',
-            value: message,
-        }
-        transmit(Connection.Broadcast, data)
-    }
 
     /**
      * Run code when a Bluetooth connection is made
      */
     //% block="on Bluetooth browser bridge connection"
+    //% group="Connection"
+    //% advanced=true
+    //% weight=55
     export function onConnected(handler: () => void): void {
         handlerConnected = handler
     }
@@ -131,8 +134,26 @@ namespace browserBridge {
      * Run code when a Bluetooth connection is lost
      */
     //% block="on Bluetooth browser bridge disconnection"
+    //% group="Connection"
+    //% advanced=true
     export function onDisconnected(handler: () => void): void {
         handlerDisconnected = handler
+    }
+
+    //% block
+    //% group="Data"
+    //% weight=65
+    export function sendString(message: string) {
+        transmit(Connection.Broadcast, message)
+    }
+
+    //% block
+    //% group="Data"
+    //% weight=63
+    //% name.defl="x"
+    export function sendValue(name: string, value: number) {
+        const data = `${name}:${value}`
+        transmit(Connection.Broadcast, data)
     }
 
     /**
@@ -141,7 +162,8 @@ namespace browserBridge {
      */
     //% draggableParameters="reporter"
     //% block="on received string $message"
-    //% message.defl=string
+    //% group="Data"
+    //% weight=55
     export function onReceivedString(handler: (message: string) => void): void {
         handlerReceivedString = handler
     }
@@ -152,9 +174,9 @@ namespace browserBridge {
      * @param value
      */
     //% draggableParameters="reporter"
-    //% block="on received value $value named $name"
-    //% name.defl=string
-    //% value.defl=number
+    //% block="on received $name named value $value"
+    //% group="Data"
+    //% weight=53
     export function onReceivedValue(handler: (name: string, value: number) => void): void {
         handlerReceivedValue = handler
     }
