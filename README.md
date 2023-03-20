@@ -1,7 +1,7 @@
 
 > Open this page at [danielgjackson.github.io/pxt-webbrowser](https://danielgjackson.github.io/pxt-webbrowser/)
 
-> On the mobile device, open the client page at [danielgjackson.github.io/pxt-webbrowser/client](https://danielgjackson.github.io/pxt-webbrowser/client/)
+> On the mobile device, in a web browser that supports *WebBluetooth* (such as *Chrome* on Android), open the client page at [danielgjackson.github.io/pxt-webbrowser/client](https://danielgjackson.github.io/pxt-webbrowser/client/)
 
 > Use the Beta version of *MakeCode* if memory is too constrained and download a V2-only image: [makecode.microbit.org/beta](https://makecode.microbit.org/beta)
 
