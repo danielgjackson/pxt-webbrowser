@@ -6,6 +6,13 @@
 > Use the Beta version of *MakeCode* if memory is too constrained and download a V2-only image: [makecode.microbit.org/beta](https://makecode.microbit.org/beta)
 
 
+<!--
+Problem with beta editor:
+
+> unable to find mbcodal-binary.hex in outfiles yotta.json, codal.json, binary.asm, binary.hex, mbdal-binary.asm
+-->
+
+
 ## Use as Extension
 
 This repository can be added as an **extension** in MakeCode.
