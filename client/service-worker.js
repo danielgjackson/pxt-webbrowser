@@ -7,7 +7,8 @@ const urls = [
     'favicon.svg',
     'index.js',
     'bridge.js',
-    'device.js',
+    'bleserial.js',
+    'serial.js',
 ];
 
 // Stale-while-revalidate

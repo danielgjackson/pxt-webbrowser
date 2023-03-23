@@ -52,7 +52,7 @@ class Bridge {
         }
         try {
             if (!this.device) {
-                this.device = await Device.create();
+                this.device = await BleSerial.create();
                 this.device.setLineHandler((line) => {
                     this.lineHandler(line);
                 });
