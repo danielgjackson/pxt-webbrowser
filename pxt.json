@@ -13,7 +13,7 @@
         "test.ts"
     ],
     "targetVersions": {
-        "target": "5.1.6",
+        "target": "5.0.12",
         "targetId": "microbit"
     },
     "supportedTargets": [
@@ -22,5 +22,16 @@
     "preferredEditor": "tsprj",
     "disablesVariants": [
         "mbdal"
-    ]
+    ],
+    "yotta": {
+        "config": {
+            "microbit-dal": {
+                "bluetooth": {
+                    "open": 1,
+                    "whitelist": 0,
+                    "security_level": null
+                }
+            }
+        }
+    }
 }
