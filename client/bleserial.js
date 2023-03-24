@@ -326,7 +326,7 @@ class BleSerial {
             //acceptAllDevices: true,
         });
 
-        return new Device(bluetoothDevice);
+        return new BleSerial(bluetoothDevice);
     }
 
 }

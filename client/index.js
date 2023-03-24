@@ -4,6 +4,8 @@
 const vsCode = (/(?:\s|^)Code\/(\d+(?:\.\d+)*)(?:\s|$)/.exec(navigator.userAgent) || [])[1];
 const debug = vsCode != null;
 const bridge = new Bridge();
+const defaultOptions = {};
+let options = defaultOptions;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -123,11 +125,17 @@ bridge.setConnectionChangeHandler((change) => {
     document.querySelector('body').classList.toggle('finished', change !== 'connected');
 });
 
-bridge.setLineHandler((line) => {
+bridge.setStringHandler((line) => {
     addBubble('incoming', line);
 });
 
+bridge.setValueHandler((name, value) => {
+    addBubble('incoming', name + ' = ' + value);
+});
+
 function startup() {
+    window.addEventListener('hashchange', hashChange);
+
     window.addEventListener('error', (error) => {
         const message = `UNHANDLED-ERROR: ${error}`;
         console.log(message);
@@ -193,6 +201,21 @@ function startup() {
 
     document.querySelector('h1').addEventListener('click', (event) => {
         reload();
+    });
+
+    hashChange();
+}
+
+function hashChange() {
+    // Load hash parameters
+    const hash = window.location.hash;
+    const hashParts = hash.substring(1).split('&');
+    options = hashParts.reduce((accumulated, part) => {
+        const [key, ...values] = part.split('=');
+        accumulated[decodeURIComponent(key)] = values.length == 0 ? null : decodeURIComponent(values.join('='));
+        return accumulated;
+    }, {
+        defaultOptions
     });
 }
 

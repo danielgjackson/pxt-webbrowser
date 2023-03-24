@@ -21,7 +21,14 @@
         "**/pxt_modules": true
     },
     "cSpell.words": [
+        "bleserial",
+        "callstack",
+        "characteristicvaluechanged",
+        "DEVICEINFO",
+        "gattserverdisconnected",
         "makecode",
-        "microbit"
+        "microbit",
+        "unopenable",
+        "winrt"
     ]
 }

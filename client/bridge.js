@@ -6,21 +6,71 @@ class Bridge {
     constructor() {
         this.device = null;
         this.handleConnectionChange = null;
-        this.handleLines = null;
+        this.handlerReceivedString = null;
+        this.handlerReceivedValue = null;
+        this.throttledData = {};
     }
 
+    throttledSend(category, delay, line) {
+        // If no data for this category
+        if (!this.throttledData.hasOwnProperty(category)) {
+            if (line !== null) { // Wait to send updated data
+                this.send(line);
+            }
+            // Set timeout to send any updated data
+            this.throttledData[category] = null;
+            setTimeout(() => {
+                const data = this.throttledData[category];
+                delete this.throttledData[category];
+                if (data) {
+                    this.send(data);
+                    this.throttledSend(category, delay, null);
+                }
+            }, delay);
+            return;
+        }
+        // If waiting to send, update data
+        this.throttledData[category] = line;
+    }
+    
     setConnectionChangeHandler(handler) {
         this.handleConnectionChange = handler;
     }
 
-    setLineHandler(handler) {
-        this.handleLines = handler;
+    setStringHandler(handler) {
+        this.handlerReceivedString = handler;
+    }
+
+    setValueHandler(handler) {
+        this.handlerReceivedValue = handler;
     }
 
     lineHandler(line) {
-        console.log('RECV: ' + line);
-        if (this.handleLines) {
-            this.handleLines(line);
+        // Differentiate string (or value) and objects
+        if (line.length <= 0 || (line[0] != '{' && line[0] != '[')) {
+            // Check whether it can be handled as name:value
+            const parts = line.split(':')
+            const name = parts[0]
+            const valueString = parts.slice(1).join(':')
+            const value = parseFloat(valueString)
+            const hasNumericValue = valueString.length > 0 && !isNaN(valueString) && !isNaN(value)
+            if (hasNumericValue) {
+                // Value type
+                console.log('RECV-VALUE: ' + name + ':' + value);
+                if (this.handlerReceivedValue != null) {
+                    this.handlerReceivedValue(name, value)
+                }
+            } else {
+                // String type
+                console.log('RECV-LINE: ' + line);
+                if (this.handlerReceivedString != null) {
+                    this.handlerReceivedString(line)
+                }
+            }
+        } else {
+            const data = JSON.parse(line)
+            // TODO: Handle object data
+            console.log('RECV-OBJ: ' + JSON.stringify(data));
         }
     }
 
