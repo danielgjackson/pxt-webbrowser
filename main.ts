@@ -81,8 +81,8 @@ namespace browserBridge {
             const name = parts[0]
             const valueString = parts.slice(1).join(':')
             const value = parseFloat(valueString)
-            
-            if (!isNaN(valueString as any) && !isNaN(parseFloat(valueString))) {
+            const hasNumericValue = valueString.length > 0 && !isNaN(valueString as any) && !isNaN(value)
+            if (hasNumericValue) {
                 // Value type
                 if (handlerReceivedValue != null) {
                     handlerReceivedValue(name, value)
