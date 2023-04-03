@@ -1,0 +1,1 @@
+node -e "name='client/service-worker.js';fs=require('fs');fs.writeFileSync(name,fs.readFileSync(name,'utf8').split(/\r?\n/).filter(s=>/\!\!\!$/.test(s)==false).join('\n')+'\n+'+(new Date()).toISOString().replace(/[^0-9]/g,'').slice(0,14)+'//\!\!\!');"

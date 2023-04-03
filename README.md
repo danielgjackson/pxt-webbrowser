@@ -3,13 +3,26 @@
 
 > On the mobile device, in a web browser that supports *WebBluetooth* (such as *Chrome* on Android), open the client page at [danielgjackson.github.io/pxt-webbrowser/client](https://danielgjackson.github.io/pxt-webbrowser/client/)
 
-> Use the Beta version of *MakeCode* if memory is too constrained and download a V2-only image: [makecode.microbit.org/beta](https://makecode.microbit.org/beta)
+<!--
+"Browser Bridge" examples:
+
+* device sensors
+* text entry
+* barcode scanning
+* face tracking
+* show web content (such as text, images, sound and video)
+* arbitrary "fetch" web requests (CORS-limited)
+-->
 
 
 <!--
+> The Beta version of *MakeCode* allows you to download a V2-only image (as memory is constrained after adding the Bluetooth extension): [makecode.microbit.org/beta](https://makecode.microbit.org/beta)
+
 Problem with beta editor:
 
 > unable to find mbcodal-binary.hex in outfiles yotta.json, codal.json, binary.asm, binary.hex, mbdal-binary.asm
+
+Instead, added `disablesVariants: mbdal` to `pxt.json`, to disallow micro:bit V1.
 -->
 
 
