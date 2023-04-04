@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <p id="status">...</p>
+    <button onclick="socket.send('hello')">Send</button>
+    <script>
+        const socket = new WebSocket('ws://localhost:3000/ws')
+        socket.onmessage = (event) => {
+            document.getElementById('status').innerText = 'Got: ' + event.data
+        }
+    </script>
+</body>
+</html>
