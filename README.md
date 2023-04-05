@@ -1,3 +1,10 @@
+<!--
+Browser Bridge
+Connection: Bluetooth LE connection, or wired USB serial connection
+Inputs: device sensors, text entry, and examples requiring higher-level processing (such as barcode scanning and face tracking)
+Outputs include web content (such as text, images, sound and video)
+Data: Fetch web requests (within constraints such as CORS)
+-->
 
 > Open this page at [danielgjackson.github.io/pxt-webbrowser](https://danielgjackson.github.io/pxt-webbrowser/)
 
