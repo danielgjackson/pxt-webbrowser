@@ -24,11 +24,17 @@
         "bleserial",
         "callstack",
         "characteristicvaluechanged",
+        "danielgjackson",
         "DEVICEINFO",
         "gattserverdisconnected",
         "makecode",
+        "mbcodal",
+        "mbdal",
         "microbit",
+        "outfiles",
         "unopenable",
-        "winrt"
+        "webbrowser",
+        "winrt",
+        "yotta"
     ]
 }
