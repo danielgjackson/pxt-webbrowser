@@ -6,6 +6,12 @@
 <!--
 "Browser Bridge"
 
+* Add log to footer
+* Add mode to title header
+* Body is mode-specific
+* Generic comms and event handler
+* Public release
+
 Connection:
 
 * Bluetooth LE connection
@@ -15,8 +21,8 @@ Connection:
 
 Inputs:
 
-* device sensors
 * text entry
+* device sensors
 * barcode scanning
 * face tracking
 
