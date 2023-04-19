@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.svg">
     <script src="bleserial.js"></script>
-    <!-- <script src="serial.js"></script> -->
+    <script src="serial.js"></script>
     <script src="bridge.js"></script>
     <script src="index.js"></script>
 </head>
@@ -37,9 +37,16 @@
     </main>
     <footer>
       <div id="controls">
-        <button id="connect">
+        <div id="connect-none">
+          ERROR: No connection methods (Web Bluetooth / Web Serial) supported by your browser.
+        </div>
+        <button id="connect-bluetooth">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-          Reconnect
+          Connect via Bluetooth
+        </button>
+        <button id="connect-serial">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+          Connect via Serial
         </button>
       </div>
 

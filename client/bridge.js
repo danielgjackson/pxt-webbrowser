@@ -93,7 +93,7 @@ class Bridge {
         return this.device !== null && this.device.isConnected();
     }
 
-    async connect() {
+    async connect(method) {
         if (this.device && this.device.isConnected()) {
             return;
         }
@@ -102,7 +102,13 @@ class Bridge {
         }
         try {
             if (!this.device) {
-                this.device = await BleSerial.create();
+                if (method === 'bluetooth') {
+                    this.device = await BleSerial.create();
+                } else if (method === 'serial') {
+                    this.device = await Serial.create();
+                } else {
+                    throw new Error('Invalid connection method');
+                }
                 this.device.setLineHandler((line) => {
                     this.lineHandler(line);
                 });
@@ -130,6 +136,17 @@ class Bridge {
         }
         await this.device.writeLine(line);
         return true;
+    }
+
+    getAvailableConnectionMethods() {
+        const methods = [];
+        if (navigator.bluetooth) {
+            methods.push('bluetooth');
+        }
+        if (navigator.serial) {
+            methods.push('serial');
+        }
+        return methods;
     }
 
 }

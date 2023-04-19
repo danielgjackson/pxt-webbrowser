@@ -84,7 +84,14 @@ function sendServiceWorker(message) {
 
 // Service Worker Registration (after page loaded)
 async function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) return null;
+    if (!('serviceWorker' in navigator)) {
+        console.log('SERVICE-WORKER: Not available.');
+        return null;
+    }
+    if (location.protocol == 'file:') {
+        //console.log('SERVICE-WORKER: Not available in file:// protocol.');
+        return null;
+    }
     try {
         // Load 'service-worker.js', must be in a top-level directory.
         const serviceWorkerFile = 'service-worker.js';
@@ -139,6 +146,7 @@ function startup() {
     window.addEventListener('error', (error) => {
         const message = `UNHANDLED-ERROR: ${error}`;
         console.log(message);
+        console.dir(error);
     });
 
     window.addEventListener("unhandledrejection", function (event) {
@@ -148,6 +156,19 @@ function startup() {
     });
 
     registerServiceWorker();
+
+    const connectionMethods = bridge.getAvailableConnectionMethods();
+    for (const method of connectionMethods) {
+        const button = document.querySelector('#controls').classList.toggle(`${method}-available`, true);
+        document.querySelector(`#connect-${method}`).addEventListener('click', (event) => {
+            bridge.connect(method);
+        });
+    }
+    if (connectionMethods.length > 0) {
+        addBubble('state', 'Please connect over a supported method: ' + connectionMethods.join(', '));
+    } else {
+        addBubble('state', 'ERROR: No connection methods supported in your browser.');
+    }
 
     const reply = document.querySelector('#reply');
     document.querySelector('#message-form').addEventListener('submit', (event) => {
@@ -194,10 +215,6 @@ function startup() {
         // Firefox mobile on-screen keyboard dismiss issue
         reply.addEventListener('blur', () => setTimeout(viewportHandler, 100));
     }
-
-    document.querySelector('#connect').addEventListener('click', (event) => {
-        bridge.connect();
-    });
 
     document.querySelector('h1').addEventListener('click', (event) => {
         reload();

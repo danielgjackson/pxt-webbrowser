@@ -214,6 +214,26 @@ body.finished #controls {
 	animation: fade-in 2s;
 }
 
+#controls #connect-none {
+	display: none;
+}
+
+#controls:not([class]) #connect-none, #controls[class=""] #connect-none {
+	display: inline;
+}
+
+#controls > button {
+	display: none;
+}
+
+#controls.bluetooth-available #connect-bluetooth {
+	display: inline;
+}
+
+#controls.serial-available #connect-serial {
+	display: inline;
+}
+
 button {
 	border: none;
 	background: none;

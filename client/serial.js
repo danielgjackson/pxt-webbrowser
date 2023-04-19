@@ -24,7 +24,7 @@ class Serial {
 
         this.openFlag = false;
         this.unopenable = false;
-        this.buffer = [];
+        this.buffer = '';
     }
 
     internalStartRead() {
@@ -40,7 +40,17 @@ class Serial {
 serial_log('*** ' + JSON.stringify({value, done}))
             if (value !== null && typeof value !== 'undefined' && value.length > 0) {
 serial_log('<<< [' + this.buffer.length + '] ' + value);
-                this.buffer.push(value);
+                this.buffer += value;
+
+                let idx;
+                while ((idx = this.buffer.indexOf(String.fromCharCode(10))) >= 0) {
+                    let line = this.buffer.substring(0, idx);
+                    this.buffer = this.buffer.substring(idx + 1);
+                    if (line.endsWith(String.fromCharCode(13))) {
+                        line = line.substring(0, line.length - 1);
+                    }
+                    this.receiveLine(line);
+                }
             }
             if (done) {
                 serial_log("READER: Stream end");
@@ -56,7 +66,15 @@ serial_log('<<< [' + this.buffer.length + '] ' + value);
         setTimeout(this.internalStartRead.bind(this), 0);
     }
 
-    async open() {
+    isConnected() {
+        return this.openFlag;
+    }
+
+    isConnecting() {
+        return false;
+    }
+
+    async connect() {
         try {
             if (this.openFlag) { throw "Port already open"; }
 
@@ -125,6 +143,10 @@ serial_log('<<< [' + this.buffer.length + '] ' + value);
                 await this.port.close();
                 serial_log('...closed');
                 this.openFlag = false;
+
+                if (this.disconnectedHandler) {
+                    this.disconnectedHandler(this);
+                }
                 return true;
             } catch (e) {
                 serial_log('WARNING: Problem closing port -- ' + e);
@@ -134,13 +156,15 @@ serial_log('<<< [' + this.buffer.length + '] ' + value);
     }
 
     async write(message) {
-        serial_log('SEND: ' + message.replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/ /g, '☐'));
+        serial_log('SEND: ' + message);
         try {
             if (this.writer) {
                 serial_log('UNEXPECTED: Writer already exists');
             }
             this.writer = this.outputStream.getWriter();
+            serial_log('Sending...');
             await this.writer.write(message);
+            serial_log('...sent');
         } catch (e) {
             serial_log('WARNING: Problem writing data: ' + e);
             throw e;
@@ -148,6 +172,7 @@ serial_log('<<< [' + this.buffer.length + '] ' + value);
             if (this.writer) {
                 try {
                     this.writer.releaseLock();
+                    serial_log('...unlocked');
                 } catch (e) {
                     // TypeError: This writable stream writer has been released and cannot be used to monitor the stream's state
                     serial_log('WARNING: ' + e);
@@ -158,29 +183,45 @@ serial_log('<<< [' + this.buffer.length + '] ' + value);
     }
 
     async writeLine(line) {
-        const encoder = new TextEncoder('utf-8');
-        ble_log('WRITE-LINE: ' + line);
+        serial_log('WRITE-LINE: ' + JSON.stringify(line));
         const message = line + '\n';
-        const data = encoder.encode(message);
+        const data = message;  //(new TextEncoder('utf-8')).encode(message);
         await this.write(data);
     }    
 
-    async read() {
-        serial_log('Read... ' + this.buffer.length);
-        let reply = null;
-        try {
-            while (this.buffer.length > 0) {
-                if (reply === null) reply = '';
-                reply += this.buffer.shift();
-            }
-        } catch (e) {
-            serial_log('WARNING: Problem reading serial data: ' + e);
-            return null;
+    static async create() {
+        if (location.protocol === 'http:') {
+            serial_log('WARNING: WebSerial typically not supported for HTTP protocol -- you may need to use file:, https:, or content:');
         }
-        serial_log('RECV: ' + (reply === null ? '<null>' : reply.replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/ /g, '☐')));
-        return reply;
+        if (!navigator.serial) {
+            serial_log('ERROR: No navigator.serial support');
+            throw ('navigator.serial not supported')
+        }
+        serial_log('CONNECT: Requesting devices... (this location protocol: ' + location.protocol + ')');
+
+        let serialDevice = await navigator.serial.requestPort(
+            //{ filters: [{ usbVendorId: 0x0d28, usbProductId: 0x0204 }] }
+        );
+
+        return new Serial(serialDevice);
     }
 
+    receiveLine(line) {
+        serial_log('UART: RECV-LINE: ' + JSON.stringify(line));
+        if (this.lineHandler) {
+            this.lineHandler(line);
+        }
+    }
+
+    setLineHandler(lineHandler) {
+        const oldLineHandler = this.lineHandler;
+        this.lineHandler = lineHandler;
+        return oldLineHandler;
+    }
+
+    setDisconnectedHandler(disconnectedHandler) {
+        this.disconnectedHandler = disconnectedHandler;
+    }
 }
 
 //export default Serial;
