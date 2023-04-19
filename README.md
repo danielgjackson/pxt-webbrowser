@@ -11,6 +11,9 @@
 * Body is mode-specific
 * Generic comms and event handler
 * Public release
+* Links
+  * Workshop submission: https://electrofab.prototyping.id/assets/papers/electrofab23-final14.pdf
+  * Related work for UI: [RemoteXY](https://remotexy.com/en/)
 
 Connection:
 
