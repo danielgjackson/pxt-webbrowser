@@ -65,7 +65,8 @@ function addBubble(direction, text, media = null, target = null) {
 }
 
 function clearState() {
-    changeMode('connected');
+    changeMode(bridge.isConnected() ? 'connected' : 'disconnected');
+    document.querySelector('#output').innerHTML = '';
 }
 
 async function sendMessage(text) {
