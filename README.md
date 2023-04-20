@@ -5,9 +5,29 @@
 
 <!--
 "Browser Bridge"
-
-* Add mode to title header
 * Additional modes
+
+// Mode and events
+<<< {_:"m",n:""}
+// -- returns to 'connected' state, allows generic text entry
+
+<<< {"_":"m","n":"scan"}
+>>> {"_":"e","n":"scan","v":"123"}
+
+<<< {"_":"m","n":"face"}
+>>> {"_":"e","n":"face","v":1.23}
+
+<<< {"_":"m","n":"web","v":"http://example.org"}
+
+// Action: fetch and response
+<<< {"_":"f","n":"ip","v":"//icanhazip.com"} // http://boredapi.com/api/activity/
+>>> {"_":"f","n":"ip","v":"..."}
+
+// Stream: sensors and values
+<<< {"_":"s","n":"accel"}
+>>> {"_":"s","n":"accel",v:[1.2,3.4,5.6]}
+
+
 * Generic comms and event handler
 * Public release
 * Links

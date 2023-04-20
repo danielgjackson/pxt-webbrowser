@@ -5,10 +5,25 @@ const vsCode = (/(?:\s|^)Code\/(\d+(?:\.\d+)*)(?:\s|$)/.exec(navigator.userAgent
 const debug = vsCode != null;
 const bridge = new Bridge();
 const defaultOptions = {};
+let currentMode = '';
 let options = defaultOptions;
+let streamingAccel = false;
+let previousAccel = null;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function importScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.onload = function(event) {
+            resolve(script);
+        }
+        script.onerror = reject;
+        script.src = src;
+        document.head.appendChild(script);
+    });
 }
 
 async function scrollToBottom() {
@@ -49,9 +64,7 @@ function addBubble(direction, text, media = null, target = null) {
 }
 
 function clearState() {
-    if (document.querySelector('body')) {
-        document.querySelector('body').className = 'mode-connected';
-    }
+    changeMode('connected');
 }
 
 async function sendMessage(text) {
@@ -134,9 +147,9 @@ async function registerServiceWorker() {
 bridge.setConnectionChangeHandler((change) => {
     addBubble('state', 'CONNECTION: ' + change);
     if (change === 'connected') {
-        document.querySelector('body').className = 'mode-connected';
+        changeMode('connected');
     } else {
-        document.querySelector('body').className = 'mode-disconnected';
+        changeMode('disconnected');
     }
 });
 
@@ -146,6 +159,96 @@ bridge.setStringHandler((line) => {
 
 bridge.setValueHandler((name, value) => {
     addBubble('incoming', name + ' = ' + value);
+});
+
+bridge.setObjectHandler((obj) => {
+    //addBubble('incoming', JSON.stringify(obj));
+    console.log('REMOTE-INCOMING: ' + JSON.stringify(obj));
+
+    if (obj && obj._) {
+        const type = obj._;
+        if (type == 'm') {  // mode
+            let name = obj.n;       // mode name
+            if (name.length == 0) name = 'connected';
+
+            if (name == 'web') {
+                const value = obj.v;       // URL
+                console.log('REMOTE-WEB: ' + value);
+                changeMode(name);
+                document.querySelector('#web').src = value;
+
+            } else {
+                console.log('REMOTE-MODE: ' + name);
+                changeMode(name);
+            }
+
+        } else if (type == 's') {   // stream sensors
+            const name = obj.n;     // type ("accel")
+            if (name == 'accel') {
+                console.log('REMOTE-STREAM: accel');
+                if (!streamingAccel) {
+                    try {
+                        console.log('REMOTE-STREAM-ACCEL: Starting...');
+                        const accel = new Accelerometer({ frequency: 10 });
+                        accel.addEventListener("reading", () => {
+                            const values = [parseFloat(accel.x.toFixed(2)), parseFloat(accel.y.toFixed(2)), parseFloat(accel.z.toFixed(2))];
+                            let delta = 0.15;
+                            let unchanged = (previousAccel && Math.abs(previousAccel[0] - values[0]) <= delta && Math.abs(previousAccel[1] - values[1]) <= delta && Math.abs(previousAccel[2] - values[2]) <= delta);
+                            if (!unchanged) {
+                                previousAccel = [...values];
+                                console.log('! ' + values);
+                                bridge.throttledSend('accel', 500, true, JSON.stringify(
+                                    { _: "e", n: "accel", v: values }
+                                ));
+                            }
+                        });
+                        accel.start();
+                        streamingAccel = true;
+                        console.log('REMOTE-STREAM-ACCEL: ...started -- may need to interact with page to enable sensor');
+                    } catch (e) {
+                        console.log('REMOTE-STREAM-ACCEL-ERROR: ' + e);
+                        console.dir(e);
+                    }
+                }
+                
+            } else {
+                console.log('REMOTE-STREAM-UNKNOWN: ' + name);
+            }
+
+        } else if (type == 'f') {   // action: fetch
+            const name = obj.n;     // ID
+            const value = obj.v;    // Value (address)
+            console.log('REMOTE-FETCH: ' + name + ' -- ' + value);
+
+            (async () => {
+                try {
+                    const response = await fetch(value);
+                    if (response.ok) {
+                        let data = await response.text();
+
+                        // Remove any trailing \r\n
+                        if (data.length > 0 && (data[data.length - 1] == '\n')) { data = data.substring(0, data.length - 1); }
+                        if (data.length > 0 && (data[data.length - 1] == '\r')) { data = data.substring(0, data.length - 1); }
+
+                        console.log('REMOTE-FETCH-RESPONSE-OK: ' + data);
+                        bridge.send(JSON.stringify({ _: 'f', n: name, v: data }));
+                    } else {
+                        console.log('REMOTE-FETCH-RESPONSE-NOT-OK: ' + response.status);
+                        bridge.send(JSON.stringify({ _: 'f', n: name, v: null }));
+                    }
+                } catch (e) {
+                    console.log('REMOTE-FETCH-FAILED: ' + e);
+                    bridge.send(JSON.stringify({ _: 'f', n: name, v: null }));
+                }
+            })();
+
+        } else {
+            console.log('REMOTE-UNKNOWN: ' + type);
+        }
+    } else {
+        console.log('REMOTE-UNHANDLED-OBJ: ' + JSON.stringify(obj));
+    }
+
 });
 
 function startup() {
@@ -177,7 +280,7 @@ function startup() {
     } else {
         addBubble('state', 'ERROR: No connection methods supported in your browser.');
     }
-    document.querySelector('body').className = 'mode-disconnected';
+
 
     const reply = document.querySelector('#reply');
     document.querySelector('#message-form').addEventListener('submit', (event) => {
@@ -229,7 +332,160 @@ function startup() {
         reload();
     });
 
+
+    // MODE: Barcode Scan
+    const doCancelScan = async () => {
+        try {
+            console.log('BARCODE: Cancel: Awaiting...')
+            await Barcode.cancel();
+            // console.log('BARCODE: Cancel: ...awaited')
+        } catch (e) {
+            console.error('BARCODE: Error during cancellation: ' + e);
+        }
+    }
+    const cancelScan = () => {
+        // console.log('BARCODE: Cancel: Trigger')
+        doCancelScan();
+        // console.log('BARCODE: Cancel: End of trigger')
+    }
+    document.querySelector('#start-scan').addEventListener('click', async () => {
+        try {
+            document.querySelector('#main-scan').classList.add('scanning');
+            const scanResult = await Barcode.scan({
+                //readers: 'code_128,ean',
+            });
+            if (scanResult != null) {
+                console.log('SCAN: Result=' + scanResult);
+                const evt = { _: "e", n: "scan", v: scanResult };
+                if (currentMode == 'scan') {
+                    sendMessage(JSON.stringify(evt));
+                }
+            } else {
+                console.log('SCAN: No result.');
+            }
+        } catch (e) {
+            console.log('SCAN: Error=' + JSON.stringify(e));
+            console.dir(e);
+        } finally {
+            document.querySelector('#main-scan').classList.remove('scanning');
+        }
+    });
+    document.querySelector('#stop-scan').addEventListener('click', cancelScan);
+
+
+    // MODE: Face detection
+    document.querySelector('#start-face').addEventListener('click', async () => {
+        const baseUrl = './scripts/face-api.js/';
+        const videoElement = document.querySelector('#inputVideo');
+
+        if (!document.face_script) {
+            try {
+                console.log('FACE: Loading script...');
+                await importScript(baseUrl + 'face-api.min.js');
+                document.face_script = true;
+            } catch (e) {
+                console.log(`ERROR: Problem loading face detection script: ${e}`);
+                return;
+            }
+        }
+        if (!document.face_data) {
+            try {
+                console.log('FACE: Loading data...');
+
+                // Load face models
+                await faceapi.nets.tinyFaceDetector.load(baseUrl);
+                await faceapi.loadFaceLandmarkModel(baseUrl);
+
+                const onPlay = async () => {
+                    if (!videoElement.paused && !videoElement.ended && !!faceapi.nets.tinyFaceDetector.params) {
+                        // Detect faces
+                        const options = new faceapi.TinyFaceDetectorOptions({
+                            inputSize: 224, 
+                            scoreThreshold: 0.5, 
+                        });
+                        const result = await faceapi.detectAllFaces(videoElement, options).withFaceLandmarks();
+                    
+                        if (result) {
+                            // Show the detection results on the video overlay
+                            const canvas = document.querySelector('#overlay');
+                            const dims = faceapi.matchDimensions(canvas, videoElement, true);
+                            const resizedResult = faceapi.resizeResults(result, dims);
+                            faceapi.draw.drawDetections(canvas, resizedResult);
+                            faceapi.draw.drawFaceLandmarks(canvas, resizedResult);
+
+                            // Find the user with the closest distance (null if none)
+                            let closestDistance = null;
+                            for (let i = 0; i < result.length; i++) {
+                                // Get the first landmark from each eye
+                                const leftEye = result[0].landmarks.getLeftEye()[0];
+                                const rightEye = result[0].landmarks.getRightEye()[0];
+
+                                // Assuming facing camera: calculate the inter-pupillary distance in pixels using Pythagoras...
+                                const ipdPixels = Math.sqrt((rightEye.x - leftEye.x) ** 2 + (rightEye.y - leftEye.y) ** 2);
+                                // ...normalized by the imaging width
+                                const ipdNormalized = ipdPixels / result[0].detection._imageDims._width;
+
+                                // Calculate a rough distance estimate based on the reciprocal
+                                const distance = 1 / ipdNormalized;
+
+                                // Track the closest face found
+                                if (closestDistance === null || distance < closestDistance) closestDistance = distance;
+                            }
+
+                            const info = `distance: ${closestDistance == null ? '-' : closestDistance.toFixed(1)}`;
+                            document.querySelector('#info').innerText = info;
+
+                            if (currentMode == 'face') {
+                                bridge.throttledSend('face', 500, true, JSON.stringify(
+                                    { _: "e", n: "face", v: closestDistance == null ? null : parseFloat(closestDistance.toFixed(1)) }
+                                ));
+                            }
+                        }
+                    }
+                    setTimeout(() => onPlay());
+                }
+                videoElement.addEventListener('loadedmetadata', onPlay);
+
+                document.face_data = true;
+            } catch (e) {
+                console.log(`ERROR: Problem loading face detection data: ${e}`);
+                console.dir(e);
+                return;
+            }
+        }
+        console.log('FACE: ...loaded');
+
+        if (!document.face_running) {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.log(`ERROR: getUserMedia() not supported -- be sure the page is served over HTTPS`);
+                return;
+            }
+            // Ask the user for camera permission and stream it to the video element
+            try {
+                videoElement.srcObject = await navigator.mediaDevices.getUserMedia({ video: {} });
+                document.face_running = true;
+                document.querySelector('.face-controls').classList.add('started');
+            } catch (e) {
+                console.log(`ERROR: Camera issue -- check permission was given: ${e}`);
+                return;
+            }
+        }
+        console.log('FACE: ...running');
+    });
+
+
+    changeMode('disconnected');
+
     hashChange();
+
+    // Testing
+    //bridge.lineHandler(JSON.stringify({_:"m",n:""}));
+    //bridge.lineHandler(JSON.stringify({_:"m",n:"scan"}));
+    //bridge.lineHandler(JSON.stringify({_:"m",n:"face"}));
+    //bridge.lineHandler(JSON.stringify({_:"m",n:"web",v:"http://example.org"}));
+    //bridge.lineHandler(JSON.stringify({_:"f",n:"ip",v:"//icanhazip.com"}));
+    //bridge.lineHandler(JSON.stringify({_:"s",n:"accel"}));
+    
 }
 
 function hashChange() {
@@ -243,6 +499,16 @@ function hashChange() {
     }, {
         defaultOptions
     });
+}
+
+function changeMode(mode) {
+    currentMode = mode;
+    if (document.querySelector('body')) {
+        document.querySelector('body').className = 'mode-' + mode;
+    }
+    if (document.querySelector('#state')) {
+        document.querySelector('#state').innerText = mode;
+    }
 }
 
 window.addEventListener('load', startup);

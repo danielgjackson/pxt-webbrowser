@@ -8,10 +8,20 @@ class Bridge {
         this.handleConnectionChange = null;
         this.handlerReceivedString = null;
         this.handlerReceivedValue = null;
+        this.handlerReceivedObject = null;
         this.throttledData = {};
+        this.throttledHistory = {};
     }
 
-    throttledSend(category, delay, line) {
+    throttledSend(category, delay, onlyIfDifferent, line) {
+        if (line !== null) {
+            if (onlyIfDifferent && this.throttledHistory.hasOwnProperty(category) && this.throttledHistory[category] == line) {
+                // Do not send identical data
+                return;
+            }
+            this.throttledHistory[category] = line;
+        }
+
         // If no data for this category
         if (!this.throttledData.hasOwnProperty(category)) {
             if (line !== null) { // Wait to send updated data
@@ -24,7 +34,7 @@ class Bridge {
                 delete this.throttledData[category];
                 if (data) {
                     this.send(data);
-                    this.throttledSend(category, delay, null);
+                    this.throttledSend(category, delay, onlyIfDifferent, null);
                 }
             }, delay);
             return;
@@ -45,6 +55,10 @@ class Bridge {
         this.handlerReceivedValue = handler;
     }
 
+    setObjectHandler(handler) {
+        this.handlerReceivedObject = handler;
+    }
+    
     lineHandler(line) {
         // Differentiate string (or value) and objects
         if (line.length <= 0 || (line[0] != '{' && line[0] != '[')) {
@@ -68,9 +82,17 @@ class Bridge {
                 }
             }
         } else {
-            const data = JSON.parse(line)
-            // TODO: Handle object data
-            console.log('RECV-OBJ: ' + JSON.stringify(data));
+            try {
+                const data = JSON.parse(line)
+                // TODO: Handle object data
+                console.log('RECV-OBJ: ' + JSON.stringify(data));
+                if (this.handlerReceivedObject != null) {
+                    this.handlerReceivedObject(data)
+                }
+            } catch (e) {
+                console.log('RECV-OBJ-ERROR: ' + line);
+                console.dir(e);
+            }
         }
     }
 
@@ -132,7 +154,10 @@ class Bridge {
 
     async send(line) {
         if (!this.device || !this.device.isConnected()) {
+            console.log('NOT SENDING: ' + line)
             return false;
+        } else {
+            console.log('SENDING: ' + line)
         }
         await this.device.writeLine(line);
         return true;

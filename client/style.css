@@ -287,6 +287,7 @@ button > svg {
 	height: 15vh;
 	min-height: 15vh;
 	max-height: 15vh;
+	margin-bottom: 0.5em;
 }
 
 #output p {
@@ -305,3 +306,95 @@ body main { display: none; }
 body.mode-startup main#main-startup { display: block; }
 body.mode-disconnected main#main-disconnected { display: block; }
 body.mode-connected main#main-connected { display: block; }
+body.mode-scan main#main-scan { display: block; }
+body.mode-face main#main-face { display: block; }
+body.mode-web main#main-web { display: block; }
+
+
+/* Message Form */
+#message-form {
+	display: none;
+}
+body.mode-connected #message-form { display: flex; }
+
+
+/* Scan Controls */
+.scan-controls {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: 10px;
+	display: block;
+	text-align: center;
+}
+
+.scan-controls #start-scan { display: inline; }
+.scan-controls #stop-scan { display: none; }
+
+main#main-scan.scanning .scan-controls #start-scan { display: none; }
+main#main-scan.scanning .scan-controls #stop-scan { display: inline; }
+
+/* Scanner */
+#interactive.viewport {
+    position: relative;
+	height: 0;
+	transition: height 0.5s ease-out;
+}
+main#main-scan.scanning #interactive.viewport {
+	height: 480px;
+}
+
+#interactive.viewport > video {
+    max-width: 100%;
+    width: 100%;
+	z-index: -2;
+}
+
+#interactive.viewport > canvas.drawingBuffer {
+    position: absolute;
+    left: 0;
+    top: 0;
+	z-index: -1;
+	pointer-events: none;
+
+	display: none; /* not used */
+}
+
+
+/* Face Controls */
+.face-controls {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: 10px;
+	display: block;
+	text-align: center;
+}
+
+.face-controls.started #start-face {
+	display: none;
+}
+
+#info {
+	margin-left: 1em;
+	font-family: monospace;
+}
+
+
+
+/* Web */
+#main-web {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	z-index: 2;
+	overflow: hidden;
+}
+
+#web {
+	border: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: darkgray;
+}

@@ -28,6 +28,7 @@
     <script src="bleserial.js"></script>
     <script src="serial.js"></script>
     <script src="bridge.js"></script>
+    <script src="barcode.js"></script>
     <script src="index.js"></script>
 </head>
 <body class="mode-startup">
@@ -46,12 +47,14 @@
     <header>
       <h1>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="m 1,13 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 H 4 A 1,1 0 0 0 5,14 1,1 0 0 0 4,13 Z M 1,8 A 1,1 0 0 0 0,9 1,1 0 0 0 1,10 H 4 A 1,1 0 0 0 5,9 1,1 0 0 0 4,8 Z m 19,5 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 h 3 a 1,1 0 0 0 1,-1 1,1 0 0 0 -1,-1 z m 0,-5 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 h 3 A 1,1 0 0 0 24,9 1,1 0 0 0 23,8 Z m -5,11 a 1,1 0 0 0 -1,1 v 3 a 1,1 0 0 0 1,1 1,1 0 0 0 1,-1 v -3 a 1,1 0 0 0 -1,-1 z m -6,0 a 1,1 0 0 0 -1,1 v 3 a 1,1 0 0 0 1,1 1,1 0 0 0 1,-1 V 20 A 1,1 0 0 0 9,19 Z M 15,0 a 1,1 0 0 0 -1,1 v 3 a 1,1 0 0 0 1,1 1,1 0 0 0 1,-1 V 1 A 1,1 0 0 0 15,0 Z M 9,0 A 1,1 0 0 0 8,1 V 4 A 1,1 0 0 0 9,5 1,1 0 0 0 10,4 V 1 A 1,1 0 0 0 9,0 Z M 9,8 A 1.0001,1.0001 0 0 0 8,9 v 6 a 1.0001,1.0001 0 0 0 1,1 h 6 a 1.0001,1.0001 0 0 0 1,-1 V 9 A 1.0001,1.0001 0 0 0 15,8 Z m 1,2 h 4 v 4 H 10 Z M 6,3 C 4.3552989,3 3,4.3552989 3,6 v 12 c 0,1.644701 1.3552989,3 3,3 h 12 c 1.644701,0 3,-1.355299 3,-3 V 6 C 21,4.3552989 19.644701,3 18,3 Z m 0,2 h 12 c 0.571297,0 1,0.4287033 1,1 v 12 c 0,0.571297 -0.428703,1 -1,1 H 6 C 5.4287033,19 5,18.571297 5,18 V 6 C 5,5.4287033 5.4287033,5 6,5 Z"></path></svg>
-        <span id="title">Browser Bridge</span>
+        <span id="title">Browser Bridge: </span><span id="state">...</span>
       </h1>
     </header>
+
     <main id="main-startup">
       <p>...</p>
     </main>
+
     <main id="main-disconnected">
       <div id="controls">
         <div id="connect-none">
@@ -67,10 +70,35 @@
         </button>
       </div>
     </main>
+
     <main id="main-connected">
       <div id="messages">
       </div>
     </main>
+
+    <main id="main-scan">
+      <div class="scan-controls">
+        <button class="button" type="button" id="start-scan" title="Scan">𝄃𝄀𝄁𝄂 Scan Barcode</button>
+        <button class="button" type="button" id="stop-scan" title="Cancel Scan">× Cancel Scan</button>
+      </div>
+      <div id="interactive" class="viewport"></div>
+    </main>
+
+    <main id="main-face">
+      <div style="position: relative; float: right;" class="margin">
+        <video id="inputVideo" autoplay muted playsinline width="320"></video>
+        <canvas id="overlay" style="position: absolute; top: 0; left: 0; width: 320px; height: auto;"></canvas>
+      </div>
+      <div class="face-controls">
+        <button class="button" type="button" id="start-face">Start Face Detector</button>
+      </div>
+      <output id="info">-</output>
+    </main>
+
+    <main id="main-web">
+      <iframe id="web"></iframe>
+    </main>
+
     <footer>
       <div id="output">
       </div>
