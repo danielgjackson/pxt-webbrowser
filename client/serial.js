@@ -37,10 +37,13 @@ class Serial {
 
     internalRead({ done, value }) {
         try {
-serial_log('*** ' + JSON.stringify({value, done}))
+//serial_log('*** ' + JSON.stringify({value, done}))
             if (value !== null && typeof value !== 'undefined' && value.length > 0) {
-serial_log('<<< [' + this.buffer.length + '] ' + value);
+//serial_log('<<< [' + this.buffer.length + '] ' + value);
                 this.buffer += value;
+                
+// Temporary hack
+this.buffer = this.buffer.replaceAll(String.fromCharCode(13), String.fromCharCode(10));
 
                 let idx;
                 while ((idx = this.buffer.indexOf(String.fromCharCode(10))) >= 0) {
@@ -207,10 +210,13 @@ serial_log('<<< [' + this.buffer.length + '] ' + value);
     }
 
     receiveLine(line) {
-        serial_log('UART: RECV-LINE: ' + JSON.stringify(line));
-        if (this.lineHandler) {
-            this.lineHandler(line);
-        }
+        if (line.length == 0) return;
+        setTimeout(() => {
+            serial_log('UART: RECV-LINE: ' + JSON.stringify(line));
+            if (this.lineHandler) {
+                this.lineHandler(line);
+            }
+        }, 20);
     }
 
     setLineHandler(lineHandler) {

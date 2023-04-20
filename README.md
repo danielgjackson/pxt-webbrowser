@@ -6,9 +6,8 @@
 <!--
 "Browser Bridge"
 
-* Add log to footer
 * Add mode to title header
-* Body is mode-specific
+* Additional modes
 * Generic comms and event handler
 * Public release
 * Links

@@ -7,12 +7,30 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.svg">
+    <script>
+      // Make the log visible (useful on mobile)
+      const console_log = console.log;
+      function log(text) {
+          console_log(text);
+          setTimeout(() => {
+            const output = document.querySelector("#output");
+            if (output) {
+                const node = document.createElement("P");
+                const textNode = document.createTextNode(text);
+                node.appendChild(textNode);
+                output.appendChild(node);
+                node.scrollIntoView(false);
+            }
+          }, 20);
+      }
+      console.log = log;
+    </script>
     <script src="bleserial.js"></script>
     <script src="serial.js"></script>
     <script src="bridge.js"></script>
     <script src="index.js"></script>
 </head>
-<body class="finished">
+<body class="mode-startup">
 
     <template id="bubble">
       <li class="message">
@@ -31,11 +49,10 @@
         <span id="title">Browser Bridge</span>
       </h1>
     </header>
-    <main>
-      <div id="messages">
-      </div>
+    <main id="main-startup">
+      <p>...</p>
     </main>
-    <footer>
+    <main id="main-disconnected">
       <div id="controls">
         <div id="connect-none">
           ERROR: No connection methods (Web Bluetooth / Web Serial) supported by your browser.
@@ -49,7 +66,14 @@
           Connect via Serial
         </button>
       </div>
-
+    </main>
+    <main id="main-connected">
+      <div id="messages">
+      </div>
+    </main>
+    <footer>
+      <div id="output">
+      </div>
       <form id="message-form">
         <input id="reply" type="text" placeholder="Message" enterkeyhint="send" autocomplete="off">
         <button type="submit">

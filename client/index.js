@@ -13,13 +13,17 @@ function sleep(ms) {
 
 async function scrollToBottom() {
     await sleep(0);  // Allow for any reflow before scroll
-    const main = document.querySelector("main");
+    const main = document.querySelector("main#main-connected");
     if (main) {
         main.scrollTo(0, main.scrollHeight);
     }
 }
 
 function addBubble(direction, text, media = null, target = null) {
+    if (direction == 'incoming') { console.log('<<< ' + text); }
+    else if (direction == 'outgoing') { console.log('>>> ' + text); }
+    else if (direction == 'state') { console.log('*** ' + text); }
+    else { console.log('--- ' + text); }
     const template = document.querySelector("#bubble");
     const bubble = template.content.cloneNode(true).firstElementChild;
     bubble.classList.add(direction);
@@ -46,7 +50,7 @@ function addBubble(direction, text, media = null, target = null) {
 
 function clearState() {
     if (document.querySelector('body')) {
-        document.querySelector('body').classList.remove('finished');
+        document.querySelector('body').className = 'mode-connected';
     }
 }
 
@@ -129,7 +133,11 @@ async function registerServiceWorker() {
 
 bridge.setConnectionChangeHandler((change) => {
     addBubble('state', 'CONNECTION: ' + change);
-    document.querySelector('body').classList.toggle('finished', change !== 'connected');
+    if (change === 'connected') {
+        document.querySelector('body').className = 'mode-connected';
+    } else {
+        document.querySelector('body').className = 'mode-disconnected';
+    }
 });
 
 bridge.setStringHandler((line) => {
@@ -169,6 +177,7 @@ function startup() {
     } else {
         addBubble('state', 'ERROR: No connection methods supported in your browser.');
     }
+    document.querySelector('body').className = 'mode-disconnected';
 
     const reply = document.querySelector('#reply');
     document.querySelector('#message-form').addEventListener('submit', (event) => {

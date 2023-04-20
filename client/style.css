@@ -58,6 +58,14 @@ header {
 	overflow: hidden;
 }
 
+footer {
+	box-sizing: border-box;
+	display: grid;
+	grid-template-areas: "output";
+	grid-template-columns: 100%;
+	grid-template-rows: 1fr;
+}
+
 h1 {
 	white-space: nowrap;
 	cursor: pointer;
@@ -188,8 +196,6 @@ footer form {
 	display: flex;
 	flex-direction: row;
 	padding: 0.5em 1em;
-	max-width: 50em;
-	margin: auto;
 }
 
 footer input {
@@ -204,14 +210,8 @@ body.finished footer form {
 }
 
 #controls {
-	display: none;
 	text-align: center;
 	margin: 1em 0;
-}
-
-body.finished #controls {
-	display: block;
-	animation: fade-in 2s;
 }
 
 #controls #connect-none {
@@ -236,9 +236,11 @@ body.finished #controls {
 
 button {
 	border: none;
-	background: none;
-	margin-left: 1em;
+	background-color: var(--accent-background-color);
 	color: var(--accent-color);
+	margin-left: 1em;
+	padding: 0.5em;
+	border-radius: 10px;
 }
 
 button svg {
@@ -269,3 +271,37 @@ button > svg {
 	width: 2.0em;
 	height: auto;
 }
+
+#output {
+	grid-area: output;
+
+	box-shadow: inset 4px 4px 10px #aaa;
+	background: white;
+	color: black;
+	margin-top: 1em;
+	font-family: monospace;
+	overflow-y: auto;
+	padding: 0.3em;
+	padding-right: 0;
+	border-radius: 4px;
+	height: 15vh;
+	min-height: 15vh;
+	max-height: 15vh;
+}
+
+#output p {
+	font-size: 14px;
+	font-weight: bold;
+	padding: 0.2em;
+	margin: 0;
+}
+
+#output p:nth-child(odd) {
+	background: linear-gradient(to bottom, #3ee2, #3ee2 50%, #3992 50%, #3952);
+	background-size: 100% 2px;
+}
+
+body main { display: none; }
+body.mode-startup main#main-startup { display: block; }
+body.mode-disconnected main#main-disconnected { display: block; }
+body.mode-connected main#main-connected { display: block; }
