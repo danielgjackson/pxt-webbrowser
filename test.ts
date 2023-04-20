@@ -1,8 +1,8 @@
-browserBridge.onConnected(function () {
-    basic.showIcon(IconNames.Yes)
+input.onButtonPressed(Button.A, function () {
+    browserBridge.sendString("A")
 })
-browserBridge.onDisconnected(function () {
-    basic.showIcon(IconNames.No)
+input.onButtonPressed(Button.B, function () {
+    browserBridge.sendString("B")
 })
 browserBridge.onReceivedString(function (message) {
     basic.showIcon(IconNames.SmallSquare)
@@ -17,14 +17,6 @@ browserBridge.onReceivedValue(function (name, value) {
     basic.pause(500)
     basic.showNumber(value)
 })
-let count = 0
 browserBridge.startupBluetooth()
+browserBridge.startupSerial()
 basic.showIcon(IconNames.Square)
-basic.forever(function () {
-    basic.pause(1000)
-    count += 1
-    if (count >= 10) {
-        count = 0
-    }
-    browserBridge.sendString(convertToText(count))
-})

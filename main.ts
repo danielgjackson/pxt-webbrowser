@@ -62,6 +62,7 @@ namespace browserBridge {
     //% advanced=true
     export function startupSerial() {
         startup()
+        serial.setWriteLinePadding(0)
         serial.setRxBufferSize(64)
         serial.setTxBufferSize(64)
         serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
@@ -74,6 +75,12 @@ namespace browserBridge {
     // Received packet from a connection
     function receivedLine(connection: Connection, line: string) {
         let response = null
+        if (line.length > 0 && line[line.length - 1] == '\n') {
+            line = line.substr(0, line.length - 1);
+        }
+        if (line.length > 0 && line[line.length - 1] == '\r') {
+            line = line.substr(0, line.length - 1);
+        }
         // Differentiate string (or value) and objects
         if (line.length <= 0 || (line[0] != '{' && line[0] != '[')) {
             // Check whether it can be handled as name:value
