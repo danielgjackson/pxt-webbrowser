@@ -16,9 +16,13 @@ namespace browserBridge {
     let enabledBluetooth = false
     let connectedBluetooth = false
     let enabledSerial = false
+    let lastMode: string | null = null
+    let lastModeValue: string | null = null
 
     let handlerReceivedString: (message: string) => void
     let handlerReceivedValue: (name: string, value: number) => void
+    let handlerEventScan: (value: string) => void
+    let handlerEventFace: (distance: number | null) => void
     let handlerConnected: () => void
     let handlerDisconnected: () => void
 
@@ -27,6 +31,22 @@ namespace browserBridge {
         // TODO: Any global start-up logic
 
         started = true
+    }
+
+    function sendMode() {
+        if (lastMode != null) {
+            if (lastModeValue != null) {
+                sendString(JSON.stringify({ _: 'm', n: lastMode, v: lastModeValue }));
+            } else {
+                sendString(JSON.stringify({ _: 'm', n: lastMode }));
+            }
+        }
+    }
+
+    function setMode(mode: string, value: string | null) {
+        lastMode = mode;
+        lastModeValue = value;
+        sendMode();
     }
 
     //% block="start browser bridge"
@@ -103,6 +123,7 @@ namespace browserBridge {
         } else {
             const data = JSON.parse(line)
             // TODO: Handle object data
+//sendMode()
 
         }
         if (response !== null) {
@@ -127,7 +148,7 @@ namespace browserBridge {
     }
 
     /**
-     * Run code when a Bluetooth connection is made
+     * Run when a Bluetooth connection is made
      */
     //% block="on Bluetooth browser bridge connection"
     //% group="Connection"
@@ -138,13 +159,23 @@ namespace browserBridge {
     }
 
     /**
-     * Run code when a Bluetooth connection is lost
+     * Run when a Bluetooth connection is lost
      */
     //% block="on Bluetooth browser bridge disconnection"
     //% group="Connection"
     //% advanced=true
     export function onDisconnected(handler: () => void): void {
         handlerDisconnected = handler
+    }
+
+    /**
+     * Clear the Bridge device mode (default 'chat' mode)
+     */
+    //% block
+    //% group="Data"
+    //% weight=67
+    export function setModeChat(): void {
+        setMode('', null);
     }
 
     //% block
@@ -164,7 +195,7 @@ namespace browserBridge {
     }
 
     /**
-     * Run code when a string message is received
+     * Run when a string message is received
      * @param message
      */
     //% draggableParameters="reporter"
@@ -176,7 +207,7 @@ namespace browserBridge {
     }
 
     /**
-     * Run code when a value is received
+     * Run when a value is received
      * @param name
      * @param value
      */
@@ -187,5 +218,61 @@ namespace browserBridge {
     export function onReceivedValue(handler: (name: string, value: number) => void): void {
         handlerReceivedValue = handler
     }
+
+    /**
+     * Set the bridge device mode to a barcode scanner.
+     */
+    //% block
+    //% group="Scan"
+    //% weight=45
+    export function setModeScan(): void {
+        setMode('scan', null);
+    }
+
+    /**
+     * Run when a barcode is scanned
+     * @param value
+     */
+    //% draggableParameters="reporter"
+    //% block="on scanned $value"
+    //% group="Scan"
+    //% weight=40
+    export function onBarcodeScanned(handler: (value: string) => void): void {
+        handlerEventScan = handler
+    }
+
+    /**
+     * Set the bridge device mode to a face tracker.
+     */
+    //% block
+    //% group="Face"
+    //% weight=45
+    export function setModeFace(): void {
+        setMode('face', null);
+    }
+
+    /**
+     * Run when a face is tracked
+     * @param distance
+     */
+    //% draggableParameters="reporter"
+    //% block="on face tracked at distance $distance"
+    //% group="Face"
+    //% weight=40
+    export function onFaceTracked(handler: (distance: number | void) => void): void {
+        handlerEventFace = handler
+    }
+
+    /**
+     * Set the bridge device to display a web page.
+     */
+    //% block
+    //% url.defl="https://example.org"
+    //% group="Web"
+    //% weight=45
+    export function setModeWeb(url: string): void {
+        setMode('web', url);
+    }
+
 
 }
