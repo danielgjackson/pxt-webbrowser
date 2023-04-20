@@ -62,27 +62,27 @@ Device:
 
 
 // Mode and events
-<<< {_:"x",n:"d",v:1}     // device connected
->>> {_:"x",n:"b",v:1}     // bridge connected
+>>> {_:"x",n:"d",v:1}     // device connected
+<<< {_:"x",n:"b",v:1}     // bridge connected
 
-<<< {_:"m",n:""}
+>>> {_:"m",n:""}
 // -- returns to 'connected' state, allows generic text entry
 
-<<< {"_":"m","n":"scan"}
->>> {"_":"e","n":"scan","v":"123"}
+>>> {"_":"m","n":"scan"}
+<<< {"_":"e","n":"scan","v":"123"}
 
-<<< {"_":"m","n":"face"}
->>> {"_":"e","n":"face","v":1.23}
+>>> {"_":"m","n":"face"}
+<<< {"_":"e","n":"face","v":1.23}
 
-<<< {"_":"m","n":"web","v":"http://example.org"}
+>>> {"_":"m","n":"web","v":"http://example.org"}
 
 // Action: fetch and response
-<<< {"_":"f","n":"ip","v":"//icanhazip.com"} // http://boredapi.com/api/activity/
->>> {"_":"f","n":"ip","v":"..."}
+>>> {"_":"f","n":"ip","v":"//icanhazip.com"} // http://boredapi.com/api/activity/
+<<< {"_":"f","n":"ip","v":"..."}
 
 // Stream: sensors and values
-<<< {"_":"s","n":"accel"}
->>> {"_":"s","n":"accel",v:[1.2,3.4,5.6]}
+>>> {"_":"s","n":"accel"}
+<<< {"_":"s","n":"accel","v":[1.2,3.4,5.6]}
 
 
 Connection:
