@@ -9,6 +9,7 @@ let currentMode = '';
 let options = defaultOptions;
 let streamingAccel = false;
 let previousAccel = null;
+const BROWSER_BRIDGE_VERSION = 1;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -148,6 +149,7 @@ bridge.setConnectionChangeHandler((change) => {
     addBubble('state', 'CONNECTION: ' + change);
     if (change === 'connected') {
         changeMode('connected');
+        bridge.send(JSON.stringify({ _: 'x', n: 'b', v: BROWSER_BRIDGE_VERSION }));
     } else {
         changeMode('disconnected');
     }
@@ -167,7 +169,13 @@ bridge.setObjectHandler((obj) => {
 
     if (obj && obj._) {
         const type = obj._;
-        if (type == 'm') {  // mode
+
+        if (type == 'x') {  // connected
+            const name = obj.n;       // device type
+            const value = obj.v;       // software version
+            console.log('REMOTE-CONNECTED: ' + name + ' v' + value);
+
+        } else if (type == 'm') {  // mode
             let name = obj.n;       // mode name
             if (name.length == 0) name = 'connected';
 

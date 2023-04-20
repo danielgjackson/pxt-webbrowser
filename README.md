@@ -49,9 +49,22 @@ This image may take a few minutes to refresh.
 
 <!--
 "Browser Bridge"
-* Additional modes
+
+
+Device:
+* Mode change: cache, send now if connected, send when receive connected signal.
+* Events: cache, send when received if handler exists, send when handler added.
+* Node for mode change: text (""), scan, face, web
+* Node for enabling sensors: accel
+* Node for action: fetch
+* Node for action-response: fetch result
+* Node for event handing: fetch-result, accel-values, scan, face
+
 
 // Mode and events
+<<< {_:"x",n:"d",v:1}     // device connected
+>>> {_:"x",n:"b",v:1}     // bridge connected
+
 <<< {_:"m",n:""}
 // -- returns to 'connected' state, allows generic text entry
 
