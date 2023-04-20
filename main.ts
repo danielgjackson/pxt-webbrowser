@@ -6,6 +6,8 @@
 //% groups=['Connection', 'Data']
 namespace browserBridge {
 
+    const DEVICE_BRIDGE_VERSION = 1;
+
     enum Connection {
         Broadcast,  // both Bluetooth and serial (if enabled)
         Bluetooth,
@@ -18,11 +20,15 @@ namespace browserBridge {
     let enabledSerial = false
     let lastMode: string | null = null
     let lastModeValue: string | null = null
+    let enableAccelerometer = false
 
     let handlerReceivedString: (message: string) => void
     let handlerReceivedValue: (name: string, value: number) => void
+    let handlerReceivedObject: (data: any) => void
     let handlerEventScan: (value: string) => void
     let handlerEventFace: (distance: number | null) => void
+    let handlerEventFetch: (id: string, data: string | null) => void
+    let handlerEventAccel: (x: number, y: number, z: number) => void
     let handlerConnected: () => void
     let handlerDisconnected: () => void
 
@@ -121,10 +127,71 @@ namespace browserBridge {
                 }
             }
         } else {
-            const data = JSON.parse(line)
-            // TODO: Handle object data
-//sendMode()
+            let obj = null;
+            try {
+                obj = JSON.parse(line)
+            } catch (e) { ; }   // parse error
+            // Handle object data
+            if (obj && obj._) {
+                // Bridge object
+                const type = obj._;
 
+                if (type == 'x') {  // connected
+                    const name = obj.n;       // device type
+                    const value = obj.v;       // software version
+                    //console.log('REMOTE-CONNECTED: ' + name + ' v' + value);
+                    sendString(JSON.stringify({ _: 'x', n: 'd', v: DEVICE_BRIDGE_VERSION }));
+                    sendMode();
+                    if (enableAccelerometer) startAccelerometer();
+
+                } else if (type == 'e') {  // event
+                    const name = obj.n;      // event caregory (face/scan)
+                    if (name == 'face') {
+                        const value = obj.v;       // distance
+                        // Handle face result
+                        if (handlerEventFace != null) {
+                            handlerEventFace(value)
+                        }
+
+                    } else if (name == 'scan') {
+                        const value = obj.v;       // scan
+                        // Handle scan result
+                        if (handlerEventScan != null) {
+                            handlerEventScan(value)
+                        }
+
+                    } else {
+                        // unknown
+                    }
+
+                } else if (type == 'f') {  // fetch result
+                    const name = obj.n;      // fetch id
+                    const value = obj.v;     // result body
+                    // Handle fetch response
+                    if (handlerEventFetch != null) {
+                        handlerEventFetch(name, value)
+                    }
+
+                } else if (type == 's') {   // stream sensors
+                    const name = obj.n;     // type ("accel")
+                    if (name == 'accel') {
+                        const value = obj.v;    // [x,y,z]
+                        // Handle accelerometer response
+                        if (handlerEventAccel != null) {
+                            handlerEventAccel(value[0], value[1], value[2])
+                        }
+                        
+                    } else {
+                        //console.log('REMOTE-STREAM-UNKNOWN: ' + name);
+                    }
+                }
+                
+            } else if (obj) {
+                // User-object
+                if (handlerReceivedObject != null) {
+                    handlerReceivedObject(obj)
+                }
+            }
         }
         if (response !== null) {
             transmit(connection, response)
@@ -270,8 +337,55 @@ namespace browserBridge {
     //% url.defl="https://example.org"
     //% group="Web"
     //% weight=45
-    export function setModeWeb(url: string): void {
+    export function setModeWebPage(url: string): void {
         setMode('web', url);
+    }
+
+    /**
+     * Ask the bridge device to fetch the contents of a web address
+     */
+    //% block
+    //% id.defl="ip"
+    //% url.defl="https://icanhazip.com/"
+    //% group="Web"
+    //% weight=42
+    export function fetchUrl(id: string, url: string): void {
+        sendString(JSON.stringify({ _: 'm', n: id, v: url }));
+    }
+
+    /**
+     * Run when a fetch result is received
+     * @param id
+     * @param data
+     */
+    //% draggableParameters="reporter"
+    //% block="on fetch id $id containing $data"
+    //% group="Web"
+    //% weight=40
+    export function onFetchResult(handler: (id: string, data: string | null) => void): void {
+        handlerEventFetch = handler
+    }
+
+
+    //% block="start accelerometer"
+    //% group="Sensors"
+    export function startAccelerometer() {
+        enableAccelerometer = true
+        sendString(JSON.stringify({ _: 's', n: 'accel' }));
+    }
+
+    /**
+     * Run when an accelerometer event is received
+     * @param x
+     * @param y
+     * @param z
+     */
+    //% draggableParameters="reporter"
+    //% block="on accelerometer sample ($x, $y, $z)"
+    //% group="Sensors"
+    //% weight=30
+    export function onAccelSample(handler: (x: number, y: number, z: number) => void): void {
+        handlerEventAccel = handler
     }
 
 
