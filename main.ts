@@ -175,10 +175,11 @@ namespace browserBridge {
                 } else if (type == 's') {   // stream sensors
                     const name = obj.n;     // type ("accel")
                     if (name == 'accel') {
-                        const value = obj.v;    // [x,y,z]
+                        //const value: [number, number, number] = obj.v;    // [x,y,z]
                         // Handle accelerometer response
                         if (handlerEventAccel != null) {
-                            handlerEventAccel(value[0], value[1], value[2])
+                            //handlerEventAccel(value[0], value[1], value[2])
+                            handlerEventAccel(obj.x, obj.y, obj.z)
                         }
                         
                     } else {
