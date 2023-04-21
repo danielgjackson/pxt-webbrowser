@@ -1,5 +1,26 @@
 # Browser Bridge
 
+## About
+
+This is an early, experimental micro:bit MakeCode Extension which provides easy block-editor access to a (mobile) browser.
+
+The client page connects to the micro:bit via Web Bluetooth or Web Serial.
+
+The micro:bit can request/receive:
+
+* text entry
+* device sensors (accelerometer)
+* barcode scanning (camera-based)
+* face tracking (camera-based)
+* arbitrary "fetch" web requests (CORS-limited)
+* the display of arbitrary web content on the mobile screen
+
+See also:
+
+* [Related workshop](https://electrofab.prototyping.id/) submission: [electrofab23-final14](https://electrofab.prototyping.id/assets/papers/electrofab23-final14.pdf)
+* Related work for UI prototyping: [RemoteXY](https://remotexy.com/en/)
+
+
 ## Getting started
 
 > Open this page at [danielgjackson.github.io/pxt-webbrowser](https://danielgjackson.github.io/pxt-webbrowser/)
@@ -15,12 +36,6 @@ This repository can be added as an **extension** in MakeCode.
 * click on **New Project**
 * click on **Extensions** under the gearwheel menu
 * search for **https://github.com/danielgjackson/pxt-webbrowser** and import
-
-
-## Links
-
-* Workshop submission: https://electrofab.prototyping.id/assets/papers/electrofab23-final14.pdf
-* Related work for UI: [RemoteXY](https://remotexy.com/en/)
 
 
 <!--
@@ -83,30 +98,6 @@ Device:
 // Stream: sensors and values
 >>> {"_":"s","n":"accel"}
 <<< {"_":"s","n":"accel","v":[1.2,3.4,5.6]}
-
-
-Connection:
-
-* Bluetooth LE connection
-* Wired USB serial connection
-* Via server proxy
-* Via Web Extension?
-
-Inputs:
-
-* text entry
-* device sensors
-* barcode scanning
-* face tracking
-
-Outputs:
-
-* show web content (such as text, images, sound and video)
-
-Effects:
-
-* arbitrary "fetch" web requests (CORS-limited)
-
 
 
 > The Beta version of *MakeCode* allows you to download a V2-only image (as memory is constrained after adding the Bluetooth extension): [makecode.microbit.org/beta](https://makecode.microbit.org/beta)
