@@ -350,7 +350,7 @@ namespace browserBridge {
     //% group="Web"
     //% weight=42
     export function fetchUrl(id: string, url: string): void {
-        sendString(JSON.stringify({ _: 'm', n: id, v: url }));
+        sendString(JSON.stringify({ _: 'f', n: id, v: url }));
     }
 
     /**
