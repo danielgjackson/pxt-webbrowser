@@ -207,7 +207,7 @@ bridge.setObjectHandler((obj) => {
                                 previousAccel = [...values];
                                 console.log('! ' + values);
                                 bridge.throttledSend('accel', 500, true, JSON.stringify(
-                                    { _: "s", n: "accel", v: values }
+                                    { _: "s", n: "accel", x: values[0], y: values[1], z: values[2] }
                                 ));
                             }
                         });
