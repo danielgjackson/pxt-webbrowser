@@ -20,3 +20,12 @@ browserBridge.onReceivedValue(function (name, value) {
 browserBridge.startupBluetooth()
 browserBridge.startupSerial()
 basic.showIcon(IconNames.Square)
+
+
+input.onButtonPressed(Button.AB, function () {
+    browserBridge.sendString("-")
+    browserBridge.startAccelerometer()
+})
+browserBridge.onAccelSample(function (x, y, z) {
+    basic.showNumber(z)
+})
